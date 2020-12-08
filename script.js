@@ -7,6 +7,9 @@ const form = document.getElementById('form');
 const text = document.getElementById('text');
 const amount = document.getElementById('amount');
 
+
+let transactionsDATA = [];
+
 let dummyTransactions = [{
     id: 1,
     text: 'Flower',
@@ -35,6 +38,39 @@ let dummyTransactions = [{
 ]
 
 // -------------  functions  -----------
+// function to store transaction
+function addTransaction(e){
+  e.preventDefault();
+
+  console.log('hi')
+
+  if(text.value.trim() === '' || amount.value.trim() === ''  ){
+    alert('Please enter a transaction!')
+  } else{
+
+    let newTransaction = {
+      id: generateID(),
+      text: text.value,
+      amount: +amount.value,
+    };
+    console.log(newTransaction);
+
+    transactionsDATA.push(newTransaction);
+
+    addTransactionToDom(newTransaction);
+
+    updateBalances();
+
+    text.value = '';
+    amount.value= '';
+  }
+}
+
+// id generator
+function generateID(){
+  let ID = Math.floor(Math.random() * 1000000)
+  return ID;
+}
 
 // function to add elements to the DOM
 function addTransactionToDom(transaction) {
@@ -48,7 +84,7 @@ function addTransactionToDom(transaction) {
   item.classList.add(transaction.amount < 0 ? 'minus' : 'plus');
 
   item.innerHTML = `
-    ${transaction.text} <span> ${sign} ${Math.abs(transaction.amount)} <span> <button class="delete-btn">x</button>
+    ${transaction.text} <span> ${sign} ${Math.abs(transaction.amount)} <span> <button class="delete-btn" onclick="removeTransaction(${transaction.id})">x</button>
   `;
 
   list.appendChild(item);
@@ -58,7 +94,7 @@ function addTransactionToDom(transaction) {
 
 // update balances
 function updateBalances() {
-  let amounts = dummyTransactions.map((trans) => {
+  let amounts = transactionsDATA.map((trans) => {
     return trans.amount
   })
   console.log(amounts);
@@ -84,7 +120,12 @@ function updateBalances() {
   balance.innerText= `$${total}`;
   money_plus.innerText= `$${income}`;
   money_minus.innerText= `$${expense}`;
+}
 
+// removes transaction based on the id
+function removeTransaction(id){
+  transactionsDATA = transactionsDATA.filter(transaction => transaction.id !== id);
+  initialize();
 }
 
 
@@ -93,7 +134,7 @@ function updateBalances() {
 function initialize() {
   list.innerHTML = '';
 
-  dummyTransactions.forEach((trans) => {
+  transactionsDATA.forEach((trans) => {
     addTransactionToDom(trans);
   })
 
@@ -102,3 +143,8 @@ function initialize() {
 
 
 initialize();
+
+
+
+// -------------  Events listeners  -----------
+form.addEventListener('submit', addTransaction)
