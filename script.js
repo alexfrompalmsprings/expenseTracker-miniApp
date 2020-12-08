@@ -7,8 +7,11 @@ const form = document.getElementById('form');
 const text = document.getElementById('text');
 const amount = document.getElementById('amount');
 
+let localStorageTransactions = JSON.parse(localStorage.getItem('transactionsDATA'));
 
-let transactionsDATA = [];
+let transactionsDATA = localStorage.getItem('transactionsDATA') !== null ? localStorageTransactions : [];
+
+console.log(transactionsDATA);
 
 let dummyTransactions = [{
     id: 1,
@@ -39,14 +42,14 @@ let dummyTransactions = [{
 
 // -------------  functions  -----------
 // function to store transaction
-function addTransaction(e){
+function addTransaction(e) {
   e.preventDefault();
 
   console.log('hi')
 
-  if(text.value.trim() === '' || amount.value.trim() === ''  ){
+  if (text.value.trim() === '' || amount.value.trim() === '') {
     alert('Please enter a transaction!')
-  } else{
+  } else {
 
     let newTransaction = {
       id: generateID(),
@@ -61,13 +64,16 @@ function addTransaction(e){
 
     updateBalances();
 
+    // update the local storage
+    updateLocalStorage();
+
     text.value = '';
-    amount.value= '';
+    amount.value = '';
   }
 }
 
 // id generator
-function generateID(){
+function generateID() {
   let ID = Math.floor(Math.random() * 1000000)
   return ID;
 }
@@ -111,23 +117,32 @@ function updateBalances() {
   console.log(income);
 
   let expense = (amounts
-    .filter(item => item < 0)
-    .reduce((acc, item) => (acc += item), 0) *-1)
+      .filter(item => item < 0)
+      .reduce((acc, item) => (acc += item), 0) * -1)
     .toFixed(2);
   console.log(expense);
 
 
-  balance.innerText= `$${total}`;
-  money_plus.innerText= `$${income}`;
-  money_minus.innerText= `$${expense}`;
+  balance.innerText = `$${total}`;
+  money_plus.innerText = `$${income}`;
+  money_minus.innerText = `$${expense}`;
 }
 
 // removes transaction based on the id
-function removeTransaction(id){
+function removeTransaction(id) {
   transactionsDATA = transactionsDATA.filter(transaction => transaction.id !== id);
+
+  updateLocalStorage();
+
   initialize();
+
 }
 
+
+// updates the local storage
+function updateLocalStorage(){
+  localStorage.setItem('transactionsDATA', JSON.stringify(transactionsDATA))
+}
 
 
 // initialize func
