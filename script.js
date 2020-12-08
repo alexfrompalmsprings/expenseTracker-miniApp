@@ -56,13 +56,48 @@ function addTransactionToDom(transaction) {
 }
 
 
+// update balances
+function updateBalances() {
+  let amounts = dummyTransactions.map((trans) => {
+    return trans.amount
+  })
+  console.log(amounts);
+
+  let total = amounts.reduce((result, amount) => {
+    return result += amount;
+  }, 0).toFixed(2);
+  console.log(total);
+
+  let income = amounts
+    .filter(amount => amount > 0)
+    .reduce((acc, amount) => acc += amount, 0)
+    .toFixed(2);
+  console.log(income);
+
+  let expense = (amounts
+    .filter(item => item < 0)
+    .reduce((acc, item) => (acc += item), 0) *-1)
+    .toFixed(2);
+  console.log(expense);
+
+
+  balance.innerText= `$${total}`;
+  money_plus.innerText= `$${income}`;
+  money_minus.innerText= `$${expense}`;
+
+}
+
+
+
 // initialize func
-function initialize(){
+function initialize() {
   list.innerHTML = '';
 
   dummyTransactions.forEach((trans) => {
     addTransactionToDom(trans);
   })
+
+  updateBalances();
 }
 
 
